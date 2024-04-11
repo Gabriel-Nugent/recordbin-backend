@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+w$jck)4p8m#@af_qqbu3b)_o+7p25lorr(ohw5id*)g=$i6sm'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -91,7 +91,7 @@ DATABASES = {
         'ENGINE': 'mysql.connector.django',
         'NAME': 'recordbin',
         'USER': 'root',
-        'PASSWORD': 'LucyGooseyBenny209', #enter password created during MySQL setup
+        'PASSWORD': 'password', #enter password created during MySQL setup
         'HOST': 'localhost',  # Default is 'localhost' or '127.0.0.1'
         'PORT': '3306',  # Default is 3306
         'OPTIONS': {
