@@ -72,7 +72,7 @@ REST_FRAMEWORK = {'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.All
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-ROOT_URLCONF = 'recorbin.urls'
+ROOT_URLCONF = 'recordbin.urls'
 
 TEMPLATES = [
     {
