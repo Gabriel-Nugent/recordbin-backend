@@ -17,6 +17,7 @@ class Profile(APIView):
     # permission_classes = [IsAuthenticated]  # Ensure user is authenticated
 
     def get(self, request, username):  # Accept username parameter
+        print(request)
         try:
             # Retrieve the profile of the user specified by the username
             profile = Profile.objects.get(user__username=username)
