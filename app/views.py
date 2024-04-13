@@ -63,6 +63,9 @@ class UserRegistration(APIView):
             if User.objects.filter(username=username).exists():
                 return Response({'message': 'User with this username already exists'}, status=status.HTTP_400_BAD_REQUEST)
             
+            new_profile = Profile(user=username)
+            new_profile.save();
+
             # If both email and username are unique, proceed with registration
             serializer.save()
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
