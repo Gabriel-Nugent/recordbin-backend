@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('mb_id', models.CharField(help_text='MusicBrainz ID', max_length=36, unique=True)),
                 ('album_name', models.CharField(max_length=100)),
                 ('release_date', models.DateField()),
-                ('artist', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='recordbin.artist')),
+                ('artist', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.artist')),
             ],
         ),
         migrations.CreateModel(
@@ -38,18 +38,18 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('mb_id', models.CharField(help_text='MusicBrainz ID', max_length=36, unique=True)),
                 ('title', models.CharField(max_length=100)),
-                ('album', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='releases', to='recordbin.album')),
+                ('album', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='releases', to='app.album')),
             ],
         ),
         migrations.CreateModel(
             name='Profile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('followed_users', models.ManyToManyField(related_name='followers', to='recordbin.profile')),
-                ('listened_album_ids', models.ManyToManyField(related_name='saved_by', to='recordbin.profile')),
-                ('saved_artists', models.ManyToManyField(related_name='saved_by', to='recordbin.artist')),
+                ('followed_users', models.ManyToManyField(related_name='followers', to='app.profile')),
+                ('listened_album_ids', models.ManyToManyField(related_name='saved_by', to='app.profile')),
+                ('saved_artists', models.ManyToManyField(related_name='saved_by', to='app.artist')),
                 ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('saved_releases', models.ManyToManyField(related_name='saved_by', to='recordbin.release')),
+                ('saved_releases', models.ManyToManyField(related_name='saved_by', to='app.release')),
             ],
         ),
     ]
