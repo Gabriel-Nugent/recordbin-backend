@@ -22,10 +22,12 @@ class Profile(APIView):
             # Retrieve the profile of the user specified by the username
             username = "testuser"
             profile = Profile.objects.get(user__username=username)
-            serializer = ProfileSerializer(profile)
-            return Response(serializer.data)
-        except Profile.DoesNotExist:
+        except profile.DoesNotExist:
             return Response({"message": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+          serializer = ProfileSerializer(profile)
+          return Response(serializer.data)
+
 
     def put(self, request):
         # Update the current user's profile
