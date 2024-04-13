@@ -98,15 +98,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': env('MYSQLDATABASE'),
         'USER': env('MYSQLUSER'),
         'PASSWORD': env('MYSQLPASSWORD'),
         'HOST': env('MYSQLHOST'),
         'PORT': env('MYSQLPORT'),
-        'OPTIONS': {
-            'autocommit': True,
-        },
+        'ATOMIC_REQUESTS': True,
     }
 }
 
