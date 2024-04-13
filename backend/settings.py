@@ -92,42 +92,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'mysql.connector.django',
         'NAME': env('MYSQLDATABASE'),
         'USER': env('MYSQLUSER'),
         'PASSWORD': env('MYSQLPASSWORD'),
         'HOST': env('MYSQLHOST'),
         'PORT': env('MYSQLPORT'),
-        'ATOMIC_REQUESTS': True,
+        'OPTIONS': {
+            'autocommit': True,
+        },
     }
 }
-
-if DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
-    DATABASES["default"]["ATOMIC_REQUESTS"] = True
-    DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
-    CI_COLLATION = "und-x-icu"
-elif DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
-    CI_COLLATION = "NOCASE"
-elif DATABASES["default"]["ENGINE"] == "django.db.backends.mysql":
-    CI_COLLATION = "utf8mb4_unicode_ci"
-else:
-    raise NotImplementedError("Unknown database engine")
-CACHES = {
-    # Read os.environ['CACHE_URL'] and raises
-    # ImproperlyConfigured exception if not found.
-    #
-    # The cache() method is an alias for cache_url().
-    "default": env.cache(default="dummycache://"),
-}
-# Password validation
-# https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
