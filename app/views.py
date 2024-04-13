@@ -16,7 +16,7 @@ import musicbrainzngs
 class Profile(APIView):
     # permission_classes = [IsAuthenticated]  # Ensure user is authenticated
 
-    def get(self, request, username):  # Accept username parameter
+    def get(self, request):  # Accept username parameter
         print(request)
         try:
             # Retrieve the profile of the user specified by the username
