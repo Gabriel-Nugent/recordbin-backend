@@ -45,6 +45,9 @@ class UserRegistration(APIView):
     permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
         serializer = UserRegistrationSerializer(data=request.data)
+        print("User account creation attempted:")
+        print(serializer.validated_data['email'])
+        print(serializer.validated_data['username'] + "\n")
         if serializer.is_valid():
             email = serializer.validated_data['email']
             username = serializer.validated_data['username']
