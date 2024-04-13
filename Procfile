@@ -1,2 +1,2 @@
-web: gunicorn backend.wsgi
+web: gunicorn recordbin.wsgi
 release: python manage.py migrate
