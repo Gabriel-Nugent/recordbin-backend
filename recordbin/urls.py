@@ -22,7 +22,7 @@ from app.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/profile/', Profile.as_view(), name='profile_api'),
+    path('api/profile/', ProfileManager.as_view(), name='profile_api'),
     path('search-artist/', search_artist, name='search_artist'),
     path('search-release/', search_release, name='search_release'),
     path('get-artist/', get_artist, name='get_artist'),

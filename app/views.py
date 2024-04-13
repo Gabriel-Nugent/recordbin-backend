@@ -13,20 +13,18 @@ from .serializers import *
 import musicbrainzngs
 
 # DJANGO APIVIEWS
-class Profile(APIView):
+class ProfileManager(APIView):
     # permission_classes = [IsAuthenticated]  # Ensure user is authenticated
 
     def get(self, request):  # Accept username parameter
-        profile
         try:
             # Retrieve the profile of the user specified by the username
             username = "testuser"
             profile = Profile.objects.get(user__username=username)
-        except profile.DoesNotExist:
+            serializer = ProfileSerializer(profile)
+            return Response(serializer.data)
+        except Profile.DoesNotExist:
             return Response({"message": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
-        else:
-          serializer = ProfileSerializer(profile)
-          return Response(serializer.data)
 
 
     def put(self, request):
