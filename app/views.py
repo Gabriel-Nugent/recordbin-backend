@@ -20,6 +20,7 @@ class Profile(APIView):
         print(request)
         try:
             # Retrieve the profile of the user specified by the username
+            username = "testuser"
             profile = Profile.objects.get(user__username=username)
             serializer = ProfileSerializer(profile)
             return Response(serializer.data)
