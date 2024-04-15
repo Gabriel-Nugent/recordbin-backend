@@ -4,9 +4,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.contrib.auth import authenticate 
+from django.contrib.auth import authenticate , login
 from .models import *
 from .serializers import *
 
@@ -14,18 +15,14 @@ import musicbrainzngs
 
 # DJANGO APIVIEWS
 class ProfileManager(APIView):
-    # permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+    #permission_classes = [IsAuthenticated]  # Ensure user is authenticated
 
     def get(self, request):  # Accept username parameter
-        try:
-            # Retrieve the profile of the user specified by the username
-            username = "testuser"
-            profile = Profile.objects.get(user__username=username)
-            serializer = ProfileSerializer(profile)
-            return Response(serializer.data)
-        except Profile.DoesNotExist:
-            return Response({"message": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
+        user = Token.objects.get(key=auth).user
+        profile = Profile.objects.get(user=user)
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data)
 
     def put(self, request):
         # Update the current user's profile
@@ -62,12 +59,14 @@ class UserRegistration(APIView):
             # Check if a user with the provided username already exists
             if User.objects.filter(username=username).exists():
                 return Response({'message': 'User with this username already exists'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            new_profile = Profile(user=username)
-            new_profile.save();
 
             # If both email and username are unique, proceed with registration
             serializer.save()
+
+            new_user = User.objects.get(username=username)
+            new_profile = Profile(user=new_user,username=username)
+            new_profile.save();
+
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -84,10 +83,10 @@ class UserLogin(APIView):
         else:
             user = authenticate(username=identifier, password=password)
         if user:
-            token, _ = Token.objects.get_or_create(user=user)
+            token, create = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
-        
-        return Response({'message': 'Invalid login credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+          return Response({'message': 'Invalid login credentials'}, status=status.HTTP_400_BAD_REQUEST)
     
 # Creates a user list
 class CreateList(APIView):
