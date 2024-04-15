@@ -32,5 +32,7 @@ urlpatterns = [
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('login/', UserLogin.as_view(), name='user_login'),
     path('create-list/', CreateList.as_view(), name='create_list'),
-
+    path('listmanager/', ListManager.as_view(), name='list-manager'),
+    path('listchanger/', ListChanger.as_view(), name='list-changer'),
+    path('ratingmanager/', RatingManager.as_view(), name='rating_manager')
 ]

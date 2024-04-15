@@ -14,15 +14,168 @@ from .serializers import *
 import musicbrainzngs
 
 # DJANGO APIVIEWS
+class RatingManager(APIView):
+    def get(self, request):
+        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
+
+        release_id = request.GET.get("release")
+        user = Token.objects.get(key=auth).user
+
+        if Album.objects.filter(release_id=release_id).exists():
+          album = Album.objects.get(release_id=release_id) 
+          if Rating.objects.filter(user=user).filter(album=album).exists():
+            rating = Rating.objects.filter(user=user).filter(album=album).first()
+            return(Response(RatingSerializer(rating).data))
+          else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT) 
+
+    def post(self, request):
+        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
+
+        user = Token.objects.get(key=auth).user
+
+        if Album.objects.filter(release_id=request.data["release_id"]).exists():
+          album = Album.objects.get(release_id=request.data["release_id"])
+          if Rating.objects.filter(user=user).filter(album=album).exists():
+              rating = Rating.objects.filter(user=user).filter(album=album).first()
+              if (request.data["rating"] != 0):
+                rating.rating = request.data["rating"]
+                rating.status = True
+              else:
+                rating.rating = 0
+                rating.status = not rating.status
+              rating.save()
+          else:
+              rating = Rating(user=user,album=album)
+              if (request.data["rating"] != 0):
+                  rating.rating = request.data["rating"]
+                  rating.status = True
+              else:
+                rating.rating = 0
+                rating.status = not rating.status
+              rating.save()
+        else:
+          new_album = Album(
+                release_id=request.data["release_id"],
+                group_id=(request.data["group_id"]),
+                album_name=(request.data["album_name"]),
+                album_image=(request.data["album_cover"]),
+                artist=(request.data["artists"])
+          )
+          new_album.save()
+          if Rating.objects.filter(user=user).filter(album=new_album).exists():
+              rating = Rating.objects.filter(user=user).filter(album=new_album).first()
+              if (request.data["rating"] != 0):
+                rating.rating = request.data["rating"]
+                rating.status = True
+              else:
+                rating.rating = 0
+                rating.status = not rating.status
+              rating.save()
+          else:
+              rating = Rating(user=user,album=new_album)
+              if (request.data["rating"] != 0):
+                  rating.rating = request.data["rating"]
+                  rating.status = True
+              else:
+                rating.rating = 0
+                rating.status = not rating.status
+              rating.save()
+
+        return(Response(status=status.HTTP_200_OK))
+
+class ListChanger(APIView):
+    def get(self, request):
+        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
+
+        list_title = request.GET.get("title")
+        user = Token.objects.get(key=auth).user
+        list = List.objects.get(user=user,title=list_title)
+
+        return(Response(ListSerializer(list).data))
+
+    def post(self, request):
+        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
+
+        user = Token.objects.get(key=auth).user
+
+        if Album.objects.filter(release_id=request.data["release_id"]).exists():
+            album = Album.objects.get(release_id=request.data["release_id"])
+            list = List.objects.filter(user=user).filter(title=request.data["list_name"]).first()
+            list.albums.add(album)
+            list.save()
+        else:
+            new_album = Album(
+                release_id=request.data["release_id"],
+                group_id=(request.data["group_id"]),
+                album_name=(request.data["album_name"]),
+                album_image=(request.data["album_cover"]),
+                artist=(request.data["artists"])
+            )
+            new_album.save()
+
+            list = List.objects.filter(user=user).filter(title=request.data["list_name"]).first()
+            list.albums.add(new_album)
+            list.save()
+        return(Response(status=status.HTTP_200_OK))
+    
+    def delete(self, request):
+        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
+        print(request.data)
+        user = Token.objects.get(key=auth).user
+        album = Album.objects.get(release_id=request.data["release_id"])
+        list = List.objects.filter(user=user).filter(title=request.data["list_name"]).first()
+        list.albums.remove(album)
+        return(Response(status=status.HTTP_200_OK))
+        
+
+class ListManager(APIView):
+    def post(self, request):
+        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
+
+        # add new list to user
+        user = Token.objects.get(key=auth).user
+        new_list = List(
+            user=user,
+            title=request.data["list-title"],
+            description=request.data["list-description"]
+        )
+        new_list.save()
+
+        # return good status
+        return(Response(status=status.HTTP_201_CREATED))
+    
+    def get(self, request):
+        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
+
+        user = Token.objects.get(key=auth).user
+        
+        user_lists = []
+        for item in List.objects.filter(user=user):
+            user_lists.append(ListSerializer(item).data)
+        
+        return Response(user_lists)
+
 class ProfileManager(APIView):
     #permission_classes = [IsAuthenticated]  # Ensure user is authenticated
 
     def get(self, request):  # Accept username parameter
         _ , auth = request.META['HTTP_AUTHORIZATION'].split()
         user = Token.objects.get(key=auth).user
+        
+        data = []
         profile = Profile.objects.get(user=user)
-        serializer = ProfileSerializer(profile)
-        return Response(serializer.data)
+        data.append(ProfileSerializer(profile).data)
+
+        user_lists = []
+        for item in List.objects.filter(user=user):
+            user_lists.append(ListSerializer(item).data)
+        
+        data.append(user_lists)
+
+        return Response(data)
 
     def put(self, request):
         # Update the current user's profile
