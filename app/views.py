@@ -170,8 +170,18 @@ class ProfileGetter(APIView):
                 profile_data.append(ProfileSerializer(profile).data)
             return Response(profile_data)
         elif query_type == "single":
+            data = []
             profile = Profile.objects.get(username=username)
-            return Response(ProfileSerializer(profile).data)
+            data.append(ProfileSerializer(profile).data)
+            
+            user = User.objects.get(username=username)
+            user_lists = []
+            for item in List.objects.filter(user=user):
+                user_lists.append(ListSerializer(item).data)
+            
+            data.append(user_lists)
+
+            return Response(data)
 
 class ProfileManager(APIView):
     #permission_classes = [IsAuthenticated]  # Ensure user is authenticated
