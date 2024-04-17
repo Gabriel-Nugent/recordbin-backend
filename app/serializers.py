@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import *
 
+# Serializers convert the database query objects into usable data
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile

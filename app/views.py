@@ -14,6 +14,7 @@ from .serializers import *
 import musicbrainzngs
 
 # DJANGO APIVIEWS
+
 class RatingManager(APIView):
     def get(self, request):
         _ , auth = request.META['HTTP_AUTHORIZATION'].split()
@@ -157,6 +158,20 @@ class ListManager(APIView):
             user_lists.append(ListSerializer(item).data)
         
         return Response(user_lists)
+
+class ProfileGetter(APIView):
+    def get(self, request):
+        username = request.GET.get("username")
+        query_type = request.GET.get("query_type")
+
+        if query_type == "all":
+            profile_data = [];
+            for profile in Profile.objects.filter(username__contains=username):
+                profile_data.append(ProfileSerializer(profile).data)
+            return Response(profile_data)
+        elif query_type == "single":
+            profile = Profile.objects.get(username=username)
+            return Response(ProfileSerializer(profile).data)
 
 class ProfileManager(APIView):
     #permission_classes = [IsAuthenticated]  # Ensure user is authenticated
