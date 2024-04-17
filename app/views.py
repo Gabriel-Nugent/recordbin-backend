@@ -149,9 +149,8 @@ class ListManager(APIView):
         return(Response(status=status.HTTP_201_CREATED))
     
     def get(self, request):
-        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
-
-        user = Token.objects.get(key=auth).user
+        username = request.GET.get("username")
+        user = User.objects.get(username)
         
         user_lists = []
         for item in List.objects.filter(user=user):
