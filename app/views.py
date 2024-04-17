@@ -89,10 +89,9 @@ class RatingManager(APIView):
 
 class ListChanger(APIView):
     def get(self, request):
-        _ , auth = request.META['HTTP_AUTHORIZATION'].split()
-
+        username = request.GET.get("username")
         list_title = request.GET.get("title")
-        user = Token.objects.get(key=auth).user
+        user = User.objects.get(username=username)
         list = List.objects.get(user=user,title=list_title)
 
         return(Response(ListSerializer(list).data))
